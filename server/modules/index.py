@@ -1,4 +1,5 @@
 from app import app
 @app.route("/")
-def index():
-    return f"Hello World!"
+@app.route("/<name>")
+def index(name='Anonymous'):
+    return f"Hello {name}!!"
