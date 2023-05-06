@@ -10,7 +10,6 @@ services:
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
-    command: gunicorn app:app -b 0.0.0.0:6969 --workers 4 --threads 2 --worker-class gthread
 
   redis:
     image: redis:6-alpine
