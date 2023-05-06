@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install gunicorn
 COPY . .
 
-CMD ["gunicorn", "app:app", "-b", "0.0.0.0:6969"]
+CMD ["gunicorn", "--worker-class", "eventlet", "-w", "8", "module:app"]
