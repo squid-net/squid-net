@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Admin Page</title>
+  </head>
+  <body>
+    <h1>Welcome to the Admin Page</h1>
+    <div id="names-container">
+      <h2>Names:</h2>
+      <ul id="names-list"></ul>
+    </div>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"></script>
+    <script type="text/javascript">
+      var socket = io.connect('http://' + document.domain + ':' + location.port + '/admin');
+      socket.on('connect', function() {
+        console.log('Connected to server');
+      });
+      socket.on('new_name', function(name) {
+        console.log('Received new name: ' + name);
+        var li = $('<li>').text(name);
+        $('#names-list').append(li);
+      });
+    </script>
+  </body>
+</html>
