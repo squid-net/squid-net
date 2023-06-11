@@ -1,5 +1,2 @@
-flask
+Flask
 redis
-flask_socketio
-gunicorn==20.1.0
-eventlet==0.30.2

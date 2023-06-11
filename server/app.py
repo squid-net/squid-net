@@ -4,7 +4,7 @@ import json
 import os
 
 app = Flask(__name__)
-r = redis.Redis()
+r = redis.Redis(host='localhost', port=6379)
 
 @app.route('send' , methods=['POST'])
 def send():
@@ -54,4 +54,4 @@ def get_results():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=8000)
