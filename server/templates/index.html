@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IP Address List</title>
+</head>
+<body>
+    <h1>IP Address List</h1>
+    <h2>Online IPs:</h2>
+    <ul>
+        {% for ip in online_ips %}
+            <li>{{ ip }} - Online</li>
+        {% endfor %}
+    </ul>
+    <h2>Offline IPs:</h2>
+    <ul>
+        {% for ip in offline_ips %}
+            <li>{{ ip }} - Offline</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

