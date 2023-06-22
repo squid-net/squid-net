@@ -2,9 +2,25 @@ from flask import Flask, request, make_response, Response, jsonify
 import redis
 import json
 import os
+import datetime
 
 app = Flask(__name__)
 r = redis.Redis(host='localhost', port=6379)
+
+@app.route('/login', methods=['POST'])
+def login():
+    ip_address = request.remote_addr
+    r.set(f'clients:{ip_address}', 1)
+
+    return 'Login successful'
+
+@app.route('/keepalive', methods=['GET'])
+def keepalive():
+    ip_address = request.remote_addr
+    current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    r.set(f'keepalive:{ip_address}', current_time, ex=3600)  # Set expiry for 1 hour (3600 seconds)
+
+    return 'Keepalive recorded'
 
 @app.route('send' , methods=['POST'])
 def send():
