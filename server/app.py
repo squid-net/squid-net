@@ -5,7 +5,7 @@ import os
 import datetime
 
 app = Flask(__name__)
-r = redis.Redis(host='localhost', port=6379)
+r = redis.Redis(host='redis', port=6379)
 
 @app.route('/')
 def index():
@@ -87,4 +87,4 @@ def get_results():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    app.run(host='0.0.0.0', port=8000)
